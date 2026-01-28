@@ -1,29 +1,37 @@
-# Use puppeteer-node base image (Node.js with Puppeteer dependencies pre-installed)
-FROM satantime/puppeteer-node:20-slim
+FROM node:20-slim
 
-# Set working directory
 WORKDIR /app
+
+# Install wkhtmltopdf (includes wkhtmltoimage), xvfb for headless, cron, curl
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wkhtmltopdf \
+    xvfb \
+    cron \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
 COPY package*.json ./
 
-# Install all dependencies (including dev dependencies for TypeScript build)
+# Install all dependencies (including dev for TypeScript build)
 RUN npm ci
 
-# Copy TypeScript config
+# Copy TypeScript config and source
 COPY tsconfig.json ./
-
-# Copy source code
 COPY src/ ./src/
 
 # Build TypeScript
 RUN npm run build
 
-# Remove dev dependencies to reduce image size (optional but recommended)
+# Remove dev dependencies
 RUN npm prune --production
 
-# Expose port
+# Copy entrypoint
+COPY docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+ENV SCREEN_PNG_PATH=/app/screen.png
+
 EXPOSE 3000
 
-# Run the server
-CMD ["npm", "start"]
+ENTRYPOINT ["/app/entrypoint.sh"]

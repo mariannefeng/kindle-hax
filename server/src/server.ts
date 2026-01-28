@@ -1,10 +1,14 @@
+import fs from "fs";
+import path from "path";
 import express from "express";
 import { fetchBusArrivals } from "./graphql-client";
 import { generateHTML } from "./html-generator";
-import { generateImageFromHTML, closeBrowser } from "./image-generator";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const SCREEN_PNG_PATH =
+  process.env.SCREEN_PNG_PATH || path.join(__dirname, "..", "screen.png");
 
 function formatRefreshTime(date: Date): string {
   const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" });
@@ -12,25 +16,17 @@ function formatRefreshTime(date: Date): string {
   return `${dayOfWeek}, ${dateTime}`;
 }
 
-app.get("/screen", async (req, res) => {
-  try {
-    const busArrivals = await fetchBusArrivals();
-
-    const refreshTime = formatRefreshTime(new Date());
-    const html = generateHTML(busArrivals, refreshTime);
-
-    const imageBuffer = await generateImageFromHTML(html, 600, 800);
-
-    res.setHeader("Content-Type", "image/png");
-    res.setHeader("Cache-Control", "no-cache");
-    res.send(imageBuffer);
-  } catch (error) {
-    console.error("Error generating image:", error);
-    res.status(500).json({
-      error: "Failed to generate image",
-      message: error instanceof Error ? error.message : "Unknown error",
+app.get("/screen", (_req, res) => {
+  if (!fs.existsSync(SCREEN_PNG_PATH)) {
+    res.status(503).json({
+      error: "Screen image not ready yet",
+      message: "Wait for the next cron run or check logs.",
     });
+    return;
   }
+  res.setHeader("Content-Type", "image/png");
+  res.setHeader("Cache-Control", "no-cache");
+  res.sendFile(SCREEN_PNG_PATH);
 });
 
 app.get("/html", async (req, res) => {
@@ -39,19 +35,6 @@ app.get("/html", async (req, res) => {
   const html = generateHTML(busArrivals, refreshTime);
   res.send(html);
 });
-
-// call close browser explicitly so puppeteer can clean up
-const shutdown = async (signal: string) => {
-  console.log(`${signal} received, closing browser...`);
-  await closeBrowser();
-  process.exit(0);
-};
-
-// sent by docker to request shutdown
-process.on("SIGTERM", () => shutdown("SIGTERM"));
-
-// sent by ctrl + c in the terminal
-process.on("SIGINT", () => shutdown("SIGINT"));
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
