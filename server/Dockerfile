@@ -2,10 +2,9 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Install wkhtmltopdf (includes wkhtmltoimage), xvfb for headless, cron, curl
+# Install wkhtmltopdf (includes wkhtmltoimage), cron, curl (for health check in entrypoint)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wkhtmltopdf \
-    xvfb \
     cron \
     curl \
     && rm -rf /var/lib/apt/lists/*
