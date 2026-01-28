@@ -2,11 +2,12 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Install wkhtmltopdf (includes wkhtmltoimage), cron, curl (for health check in entrypoint)
+# Install wkhtmltopdf (includes wkhtmltoimage), cron, curl (for health check in entrypoint), imagemagick (for image rotation)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wkhtmltopdf \
     cron \
     curl \
+    imagemagick \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
