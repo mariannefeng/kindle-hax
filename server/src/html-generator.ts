@@ -62,13 +62,13 @@ export function generateHTML(
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 15px;
       overflow-y: auto;
     }
     
     .bus-item {
       border-radius: 8px;
       padding: 10px;
+      margin-bottom: 15px;
       border: 2px solid #000000;
     }
     
