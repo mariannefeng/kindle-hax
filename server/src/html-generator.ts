@@ -41,8 +41,8 @@ export function generateHTML(
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      width: 600px;
-      height: 800px;
+      width: 800px;
+      height: 600px;
       overflow: hidden;
     }
     
