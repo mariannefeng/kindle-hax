@@ -10,9 +10,14 @@ const PORT = process.env.PORT || 3000;
 const SCREEN_PNG_PATH =
   process.env.SCREEN_PNG_PATH || path.join(__dirname, "..", "screen.png");
 
+const TIMEZONE = "America/New_York";
+
 function formatRefreshTime(date: Date): string {
-  const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" });
-  const dateTime = date.toLocaleString("en-US");
+  const dayOfWeek = date.toLocaleDateString("en-US", {
+    weekday: "long",
+    timeZone: TIMEZONE,
+  });
+  const dateTime = date.toLocaleString("en-US", { timeZone: TIMEZONE });
   return `${dayOfWeek}, ${dateTime}`;
 }
 
