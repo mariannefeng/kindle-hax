@@ -49,7 +49,7 @@ export function generateHTML(
       font-family: Arial, sans-serif;
       padding: 20px;
       overflow: hidden;
-      transform: rotate(90deg);
+      transform: rotate(90deg) translateX(-100px) translateY(-100px);
     }
     
     .container {
