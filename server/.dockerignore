@@ -8,3 +8,4 @@ dist
 README.md
 .vscode
 .idea
+*.png

@@ -38,11 +38,16 @@ export function generateHTML(
       box-sizing: border-box;
     }
     
+    html, body {
+      width: 600px;
+      height: 800px;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      width: 800px;
-      height: 600px;
       overflow: hidden;
     }
     
@@ -50,6 +55,7 @@ export function generateHTML(
       display: flex;
       flex-direction: column;
       height: 100%;
+      transform: rotate(-90deg);
     }
     
     .refresh-time {

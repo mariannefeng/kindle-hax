@@ -26,9 +26,10 @@ RUN npm run build
 # Remove dev dependencies
 RUN npm prune --production
 
-# Copy entrypoint
+# Copy entrypoint and scripts
 COPY docker/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+COPY scripts/ /app/scripts/
+RUN chmod +x /app/entrypoint.sh /app/scripts/generate-image.sh
 
 ENV SCREEN_PNG_PATH=/app/screen.png
 
