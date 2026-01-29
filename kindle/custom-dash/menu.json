@@ -1,0 +1,16 @@
+{
+  "items": [
+    {
+      "name": "marianne hax",
+      "priority": 0,
+      "items": [
+        {
+          "name": "Start dashboard",
+          "priority": 1,
+          "action": "bin/start.sh",
+          "exitmenu": false
+        }
+      ]
+    }
+  ]
+}

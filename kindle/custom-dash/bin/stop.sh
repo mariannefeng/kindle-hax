@@ -14,11 +14,11 @@ if [ -f "$PID_FILE" ]; then
 fi
 
 # In case a refresh is mid-run, stop any script.sh that's still executing
-killall start.sh 2>/dev/null || true
+pkill -f "bin/start.sh" 2>/dev/null || true
 
 # Re-enable the screensaver so the lock button works normally again
 lipc-set-prop com.lab126.powerd preventScreenSaver 0
 
 # Restart the Kindle UI so the home screen and menus work again (no-op if we never stopped them)
-start framework   2>/dev/null || true
-start lab126_gui  2>/dev/null || true
+/sbin/start framework   2>/dev/null || true
+/sbin/start lab126_gui  2>/dev/null || true
