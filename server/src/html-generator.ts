@@ -49,6 +49,7 @@ export function generateHTML(
       font-family: Arial, sans-serif;
       padding: 20px;
       overflow: hidden;
+      transform: rotate(90deg);
     }
     
     .container {
