@@ -4,6 +4,7 @@ export function generateHTML(
   busArrivals: BusArrival[],
   refreshTime: string,
   rotate: boolean = true,
+  constrainSize: boolean = true,
 ): string {
   const next5 = busArrivals.slice(0, 5);
 
@@ -40,8 +41,7 @@ export function generateHTML(
     }
     
     html, body {
-      width: 600px;
-      height: 800px;
+      ${constrainSize ? "width: 600px; height: 800px;" : ""}
       margin: 0;
       padding: 0;
     }

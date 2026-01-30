@@ -44,7 +44,7 @@ app.get("/html", async (req, res) => {
 app.get("/", async (req, res) => {
   const busArrivals = await fetchBusArrivals();
   const refreshTime = formatRefreshTime(new Date());
-  const html = generateHTML(busArrivals, refreshTime, false);
+  const html = generateHTML(busArrivals, refreshTime, false, false);
   res.send(html);
 });
 
