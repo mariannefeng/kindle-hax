@@ -3,6 +3,7 @@ import { BusArrival } from "./types";
 export function generateHTML(
   busArrivals: BusArrival[],
   refreshTime: string,
+  rotate: boolean = true,
 ): string {
   const next5 = busArrivals.slice(0, 5);
 
@@ -49,7 +50,7 @@ export function generateHTML(
       font-family: Arial, sans-serif;
       padding: 20px;
       overflow: hidden;
-      transform: rotate(90deg) translateX(-100px) translateY(-100px);
+      ${rotate ? "transform: rotate(90deg) translateX(-100px) translateY(-100px);" : ""}
     }
     
     .container {

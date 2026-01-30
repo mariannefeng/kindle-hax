@@ -41,8 +41,18 @@ app.get("/html", async (req, res) => {
   res.send(html);
 });
 
+app.get("/", async (req, res) => {
+  const busArrivals = await fetchBusArrivals();
+  const refreshTime = formatRefreshTime(new Date());
+  const html = generateHTML(busArrivals, refreshTime, false);
+  res.send(html);
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Image endpoint: http://localhost:${PORT}/screen`);
-  console.log(`HTML endpoint: http://localhost:${PORT}/html`);
+  console.log(`Human endpoint: http://localhost:${PORT}`);
+  console.log(`Kindle screen endpoint: http://localhost:${PORT}/screen`);
+  console.log(
+    `Kindle HTML (used to generate the screen) endpoint: http://localhost:${PORT}/html`,
+  );
 });
