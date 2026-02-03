@@ -15,13 +15,13 @@ trap cleanup EXIT
 
 echo "Downloading files from $REPO_URL..."
 
-curl -sL "https://raw.githubusercontent.com/mariannefeng/kindle-hax/main/kindle/custom-dash/config.xml" -o config.xml
-curl -sL "https://raw.githubusercontent.com/mariannefeng/kindle-hax/main/kindle/custom-dash/menu.json" -o menu.json
+curl -H 'Cache-Control: no-cache' -sL "https://raw.githubusercontent.com/mariannefeng/kindle-hax/main/kindle/custom-dash/config.xml" -o config.xml
+curl -H 'Cache-Control: no-cache' -sL "https://raw.githubusercontent.com/mariannefeng/kindle-hax/main/kindle/custom-dash/menu.json" -o menu.json
 
 mkdir -p bin
 
-curl -sL "https://raw.githubusercontent.com/mariannefeng/kindle-hax/main/kindle/custom-dash/bin/start.sh" -o bin/start.sh
-curl -sL "https://raw.githubusercontent.com/mariannefeng/kindle-hax/main/kindle/custom-dash/bin/stop.sh" -o bin/stop.sh
+curl -H 'Cache-Control: no-cache' -sL "https://raw.githubusercontent.com/mariannefeng/kindle-hax/main/kindle/custom-dash/bin/start.sh" -o bin/start.sh
+curl -H 'Cache-Control: no-cache' -sL "https://raw.githubusercontent.com/mariannefeng/kindle-hax/main/kindle/custom-dash/bin/stop.sh" -o bin/stop.sh
 
 chmod +x bin/start.sh bin/stop.sh
 

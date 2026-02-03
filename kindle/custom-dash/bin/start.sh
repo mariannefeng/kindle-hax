@@ -8,9 +8,13 @@ PID_FILE="${DIR}/.dash.pid"
 SCREEN_URL="https://kindle.mariannefeng.com/screen"
 
 # Sleep window: suspend at night and wake in the morning (uses RTC wakealarm + echo mem).
-# Set hour in 24h form; sleep when hour >= SLEEP_AFTER or hour < SLEEP_UNTIL, wake at SLEEP_UNTIL.
+# Set hour in 24h form; sleep when hour >= SLEEP_AFTER or hour < SLEEP_UNTIL, wake at SLEEP_UNTIL_HOUR:SLEEP_UNTIL_MINUTE.
 SLEEP_AFTER_HOUR=22   # 10 PM: start sleeping after this hour
-SLEEP_UNTIL_HOUR=7    # 7 AM: wake at this hour and resume dashboard
+SLEEP_UNTIL_HOUR=7    # 7 AM: wake at this time
+SLEEP_UNTIL_MINUTE=0  # Wake at SLEEP_UNTIL_HOUR:SLEEP_UNTIL_MINUTE (e.g. 7:30 = 7 and 30)
+# For testing wake: set to e.g. 5 to suspend and wake in 5 minutes (overrides SLEEP_UNTIL_* when in sleep window).
+# To test: set WAKE_IN_MINUTES=5 and SLEEP_AFTER_HOUR=0 so the first loop run suspends and wakes in 5 mins.
+WAKE_IN_MINUTES=2
 RTC_WAKEALARM="/sys/class/rtc/rtc0/wakealarm"
 
 refresh_screen() {
@@ -28,18 +32,22 @@ in_sleep_window() {
   [ "$hour" -ge "$SLEEP_AFTER_HOUR" ] || [ "$hour" -lt "$SLEEP_UNTIL_HOUR" ]
 }
 
-# Set RTC wakealarm to next occurrence of SLEEP_UNTIL_HOUR (e.g. 7 AM), then suspend.
+# Set RTC wakealarm to next occurrence of SLEEP_UNTIL_HOUR:SLEEP_UNTIL_MINUTE, or WAKE_IN_MINUTES from now, then suspend.
 # On wake the script resumes and the refresh loop continues.
-# If your Kindle's date(1) doesn't support -d, wake_epoch falls back to now+1h and only one suspend happens.
 do_night_suspend() {
-  today=$(date +%Y-%m-%d)
-  hh=$(printf '%02d' "$SLEEP_UNTIL_HOUR")
-  today_wake=$(date -d "$today $hh:00:00" +%s 2>/dev/null)
   now=$(date +%s)
-  if [ -n "$today_wake" ] && [ "$now" -ge "$today_wake" ]; then
-    wake_epoch=$((today_wake + 86400))
+  if [ -n "$WAKE_IN_MINUTES" ] && [ "$WAKE_IN_MINUTES" -gt 0 ]; then
+    wake_epoch=$((now + WAKE_IN_MINUTES * 60))
   else
-    wake_epoch=${today_wake:-$((now + 3600))}
+    today=$(date +%Y-%m-%d)
+    hh=$(printf '%02d' "$SLEEP_UNTIL_HOUR")
+    mm=$(printf '%02d' "${SLEEP_UNTIL_MINUTE:-0}")
+    today_wake=$(date -d "$today $hh:$mm:00" +%s 2>/dev/null)
+    if [ -n "$today_wake" ] && [ "$now" -ge "$today_wake" ]; then
+      wake_epoch=$((today_wake + 86400))
+    else
+      wake_epoch=${today_wake:-$((now + 3600))}
+    fi
   fi
   if [ ! -w "$RTC_WAKEALARM" ]; then
     echo "No RTC wakealarm at $RTC_WAKEALARM, skipping night suspend" >&2
