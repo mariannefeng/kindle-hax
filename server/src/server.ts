@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import express from "express";
-import { fetchBusArrivals } from "./graphql-client";
+import { fetchBusArrivalByStopID, fetchBusArrivals } from "./graphql-client";
 import { generateHTML } from "./html-generator";
 
 const app = express();
@@ -35,14 +35,18 @@ app.get("/screen", (_req, res) => {
 });
 
 app.get("/html", async (req, res) => {
-  const busArrivals = await fetchBusArrivals();
+  const busArrivals = await fetchBusArrivalByStopID();
   const refreshTime = formatRefreshTime(new Date());
   const html = generateHTML(busArrivals, refreshTime);
   res.send(html);
 });
 
 app.get("/", async (req, res) => {
-  const busArrivals = await fetchBusArrivals();
+  const busArrivals = await fetchBusArrivals(
+    "PORT AUTHORITY BUS TERMINAL",
+    "158 FORT LEE-EDGEWATER-NEW YORK",
+    "Fort Lee",
+  );
   const refreshTime = formatRefreshTime(new Date());
   const html = generateHTML(busArrivals, refreshTime, false, false);
   res.send(html);

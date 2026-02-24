@@ -7,8 +7,14 @@ export interface BusArrival {
   __typename: string;
 }
 
-export interface GraphQLResponse {
+export interface StopIDResponse {
   data: {
     getBusArrivalsByStopID: BusArrival[];
+  };
+}
+
+export interface RouteResponse {
+  data: {
+    getBusArrivals: BusArrival[];
   };
 }
