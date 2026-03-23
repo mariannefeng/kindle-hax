@@ -7,8 +7,6 @@ DIR="$(dirname "$0")"
 PID_FILE="${DIR}/.dash.pid"
 SCREEN_URL="https://kindle.mariannefeng.com/screen"
 
-WAKE_IN_SECONDS=36000 # 10 hours in seconds
-
 refresh_screen() {
   curl -k "$SCREEN_URL" -o "$DIR/screen.png"
   eips -c
@@ -27,6 +25,25 @@ in_sleep_window() {
 # Blocks until wake time via rtcwake.
 do_night_suspend() {
   sync
+
+  # Before sleeping, kill wifi
+  /sbin/stop wifis
+  /sbin/stop wifim
+  /sbin/stop wifid
+
+  NOW=$(date -u +%s)
+
+  YEAR=$(date -u +%Y)
+  MONTH=$(date -u +%m)
+  DAY=$(date -u +%d)
+  TARGET=$(date -u -d "$YEAR.$MONTH.$DAY-11:00:00" +%s)
+
+  # guarantees that the wake up time is always 11am utc in the future
+  if [ "$NOW" -ge "$TARGET" ]; then
+      TARGET=$(( TARGET + 86400 ))
+  fi
+
+  WAKE_IN_SECONDS=$(( TARGET - NOW ))
   rtcwake -d rtc1 -m mem -s "$WAKE_IN_SECONDS"
 }
 
@@ -35,6 +52,12 @@ lipc-set-prop com.lab126.powerd preventScreenSaver 1
 
 # ignore term since stopping the framework/gui will send a TERM signal to our script since kual is probably related to the GUI
 trap '' TERM
+
+# Make sure wifi is up again
+/sbin/start wifid
+/sbin/start wifim
+/sbin/start wifis
+
 # Stop the Kindle UI so only our image + date/battery are visible (cleaner full-screen dashboard).
 /sbin/stop framework
 /sbin/stop lab126_gui
