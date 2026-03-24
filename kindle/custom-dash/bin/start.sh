@@ -25,14 +25,21 @@ in_sleep_window() {
   [ "$hour" -ge 20 ] || [ "$hour" -lt 6 ]
 }
 
-# Blocks until wake time via rtcwake.
-do_night_suspend() {
-  sync
+start_wifi() {
+  /sbin/start wifid
+  /sbin/start wifim
+  /sbin/start wifis
+}
 
-  # Before sleeping, kill wifi
+stop_wifi() {
   /sbin/stop wifis
   /sbin/stop wifim
   /sbin/stop wifid
+}
+
+# Blocks until wake time via rtcwake.
+do_night_suspend() {
+  sync
 
   NOW=$(date +%s)
 
@@ -57,9 +64,7 @@ lipc-set-prop com.lab126.powerd preventScreenSaver 1
 trap '' TERM
 
 # Make sure wifi is up again
-/sbin/start wifid
-/sbin/start wifim
-/sbin/start wifis
+start_wifi
 
 # Stop the Kindle UI so only our image + date/battery are visible (cleaner full-screen dashboard).
 /sbin/stop framework
@@ -73,8 +78,10 @@ trap - TERM
 (
   while true; do
     if in_sleep_window; then
+      stop_wifi
       do_night_suspend || true
     else
+      start_wifi
       refresh_screen
     fi
     sleep 60
