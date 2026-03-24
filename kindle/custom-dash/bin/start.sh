@@ -13,13 +13,13 @@ refresh_screen() {
   eips -c
   eips -g "$DIR/screen.png" -x 0 -y 30 -w gc16
   # Draw date/time and battery at top (eips can't print %, so we strip it from gasgauge-info -c)
-  eips 1 1 "$(TZ=EST5EDT date '+%Y-%m-%d %I:%M %p') - wifi $(cat /sys/class/net/wlan0/operstate 2>/dev/null || echo '?') - battery: $(gasgauge-info -c 2>/dev/null | sed 's/%//g' || echo '?')"
+  eips 1 1 "$(date '+%Y-%m-%d %I:%M %p') - wifi $(cat /sys/class/net/wlan0/operstate 2>/dev/null || echo '?') - battery: $(gasgauge-info -c 2>/dev/null | sed 's/%//g' || echo '?')"
 }
 
 in_sleep_window() {
-  hour=$(TZ=EST5EDT date +%H)
-  # sleep if later than 9pm or before 7am
-  [ "$hour" -ge 21 ] || [ "$hour" -lt 7 ]
+  hour=$(date +%H)
+  # sleep if later than 8pm or before 6am
+  [ "$hour" -ge 20 ] || [ "$hour" -lt 6 ]
 }
 
 # Blocks until wake time via rtcwake.
@@ -31,14 +31,14 @@ do_night_suspend() {
   /sbin/stop wifim
   /sbin/stop wifid
 
-  NOW=$(date -u +%s)
+  NOW=$(date +%s)
 
-  YEAR=$(date -u +%Y)
-  MONTH=$(date -u +%m)
-  DAY=$(date -u +%d)
-  TARGET=$(date -u -d "$YEAR.$MONTH.$DAY-11:00:00" +%s)
+  YEAR=$(date +%Y)
+  MONTH=$(date +%m)
+  DAY=$(date +%d)
+  TARGET=$(date -d "$YEAR.$MONTH.$DAY-06:00:00" +%s)
 
-  # guarantees that the wake up time is always 11am utc in the future
+  # guarantees that the wake up time is always 6am server (ny time) in the future
   if [ "$NOW" -ge "$TARGET" ]; then
       TARGET=$(( TARGET + 86400 ))
   fi
