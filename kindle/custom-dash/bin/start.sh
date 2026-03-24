@@ -3,6 +3,9 @@
 # ignore HUP since kual will exit after pressing start, and that might kill our long running script
 trap '' HUP
 
+# ny timezone is dumb 
+export TZ="EST5EDT,M3.2.0,M11.1.0"
+
 DIR="$(dirname "$0")"
 PID_FILE="${DIR}/.dash.pid"
 SCREEN_URL="https://kindle.mariannefeng.com/screen"
